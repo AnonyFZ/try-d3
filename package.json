@@ -15,7 +15,6 @@
   "private": true,
   "scripts": {
     "exec": "PATH=$PATH:./node_modules/.bin",
-    "clean": "yarn run exec && rimraf dist",
-    "watch": "yarn run clean && tsc --watch"
+    "clean": "yarn run exec && rimraf dist"
   }
 }
