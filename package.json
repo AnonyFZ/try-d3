@@ -3,8 +3,11 @@
     "d3": "^4.13.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "nodemon": "^1.17.2",
-    "rimraf": "^2.6.2",
+    "rimraf": "^2.6.2"
   },
   "name": "try-d3",
   "version": "0.0.0",
@@ -15,6 +18,7 @@
   "private": true,
   "scripts": {
     "exec": "PATH=$PATH:./node_modules/.bin",
-    "clean": "yarn run exec && rimraf dist"
+    "clean": "yarn run exec && rimraf dist",
+    "watch": "yarn run exec && babel src -d dist --watch"
   }
 }
