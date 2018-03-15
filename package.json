@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "d3": "^4.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.2",
+    "rimraf": "^2.6.2",
+    "typescript": "^2.7.2"
+  },
+  "name": "try-d3",
+  "version": "0.0.0",
+  "description": "Try to D3 Framework",
+  "main": "index.js",
+  "author": "Nattakit Boonyang <nattakit.boonyang@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "exec": "PATH=$PATH:./node_modules/.bin",
+    "clean": "yarn run exec && rimraf dist",
+    "watch": "yarn run clean && tsc --watch"
+  }
+}
