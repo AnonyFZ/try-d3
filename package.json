@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "d3": "^4.13.0"
+    "d3": "v3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
