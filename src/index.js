@@ -1,83 +1,109 @@
-const svg = d3
-  .select('body')
-  .append('svg')
-  .style('width', '100%')
-  .style('height', '100%');
-const g = svg.append('g').attr('class', 'g_root');
+document.addEventListener('contextmenu', event => event.preventDefault());
 
-function newNode(text) {
-  const rd = {
-    ri: {
-      w: 22,
-      h: 34
-    },
-    rc: {
-      w: 120,
-      h: 36
-    },
-    ro: {
-      w: 22,
-      h: 34
-    }
-  };
+const svg = d3.select('body').append('svg');
+svg.style({
+  width: '100%',
+  height: '100%'
+});
 
-  const node = g
-    .append('g')
-    .attr('class', 'node')
-    .style('cursor', 'pointer')
-    .call(d3.drag().on('drag', handleDragged));
+const g = svg.append('g').attr({
+  class: 'g_root'
+});
 
-  function handleDragged() {
-    const rectInput = d3.select(this).select('.rectInput'),
-      rectContent = d3.select(this).select('.rectContent'),
-      rectText = d3.select(this).select('.rectText'),
-      rectOutput = d3.select(this).select('.rectOutput'),
-      x = d3.event.x,
-      y = d3.event.y;
-    rectInput.attr('x', x - rd.rc.w / 2 - rd.ri.w).attr('y', y - rd.ri.h / 2);
-    rectContent.attr('x', x - rd.rc.w / 2).attr('y', y - rd.rc.h / 2);
-    rectText.attr('x', x).attr('y', y);
-    rectOutput.attr('x', x + rd.rc.w / 2).attr('y', y - rd.ro.h / 2);
-  }
+const diagonal = d3.svg.diagonal();
 
-  const rectInput = node
+const drag = d3.behavior.drag()
+  .origin(function () {
+    const t = d3.select(this);
+    return {
+      x: t.attr('x'),
+      y: t.attr('y')
+    };
+  })
+  .on('drag', dragged);
+
+function createNode(x, y, i) {
+  const node = g.append('g').attr({
+    class: 'g_node',
+    id: `node_${i}`
+  });
+
+  return node
     .append('rect')
-    .attr('class', 'rectInput')
-    .attr('width', rd.ri.w)
-    .attr('height', rd.ri.h)
-    .attr('x', 0)
-    .attr('y', rd.rc.h / 2 - rd.ri.h / 2)
-    .attr('fill', 'rgb(255, 252, 218)')
-    .attr('stroke', 'rgb(117, 107, 0)');
-
-  const rectContent = node
-    .append('rect')
-    .attr('class', 'rectContent')
-    .attr('width', rd.rc.w)
-    .attr('height', rd.rc.h)
-    .attr('x', rd.ri.w)
-    .attr('y', 0)
-    .attr('fill', 'rgb(255, 252, 218)')
-    .attr('stroke', 'rgb(117, 107, 0)');
-
-  const rectText = node
-    .append('text')
-    .attr('class', 'rectText')
-    .attr('text-anchor', 'middle')
-    .attr('alignment-baseline', 'middle')
-    .attr('x', rd.ri.w + rd.rc.w / 2)
-    .attr('y', rd.rc.h / 2)
-    .text(text);
-
-  const rectOutput = node
-    .append('rect')
-    .attr('class', 'rectOutput')
-    .attr('width', rd.ro.w)
-    .attr('height', rd.ro.h)
-    .attr('x', rd.ri.w + rd.rc.w)
-    .attr('y', rd.rc.h / 2 - rd.ro.h / 2)
-    .attr('fill', 'rgb(255, 252, 218)')
-    .attr('stroke', 'rgb(117, 107, 0)');
+    .attr({
+      class: 'rect',
+      width: 50,
+      height: 50,
+      x: x,
+      y: y,
+      fill: 'lightgray',
+      stroke: 'gray',
+      'stroke-width': 4
+    })
+    .style({
+      cursor: 'pointer',
+      opacity: 0.5
+    })
+    .on('dblclick', clicked)
+    .on('mouseover', mouseover)
+    .on('mouseout', mouseout)
+    .call(drag);
 }
 
-newNode('Load Image');
+function mouseover(d) {
+  d3.select(this).style('opacity', '1.0');
+}
+
+function mouseout() {
+  d3.select(this).style('opacity', '0.5');
+}
+
+function get(r) {
+  return {
+    x: parseInt(r.attr('x')) + parseInt(r.attr('width') / 2),
+    y: parseInt(r.attr('y')) + parseInt(r.attr('height') / 2),
+    id: d3.select(r.node().parentNode).attr('id')
+  };
+}
+
+const r1 = createNode(50, 50, 1);
+const r2 = createNode(200, 90, 2);
+const r3 = createNode(70, 300, 3);
+const r4 = createNode(230, 250, 4);
+
+let source = get(r1);
+let targets = [
+  get(r2),
+  get(r3),
+  get(r4)
+];
+
+const links = targets.map(t => {
+  return {source: source, target: t};
+});
+
+function dragged() {
+  const x = d3.event.x, y = d3.event.y;
+  const parent = d3.select(this.parentNode);
+  console.log(parent);
+  d3.select(this).attr({x: x, y: y});
+}
+
+function clicked() {
+  const t = d3.select(this);
+}
+
+const link = g
+  .selectAll('path')
+  .data(links)
+  .enter()
+  .insert('g', '.g_node')
+  .attr({
+    class: 'link',
+    id: (d, i) => `link_${i}`
+  })
+  .append('path')
+  .attr({
+    d: diagonal
+  });
+
